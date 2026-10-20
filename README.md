@@ -1,5 +1,7 @@
 # Varietal
 
+A free and self-hostable way to track you cellar.
+
 A personal wine cellar tracker. Look wines up on the web, keep track of bottles, and see what's in its drinking window.
 
 - **Tonight**: the bottle to open next, what else is ready to drink (most urgent first), what's coming into its window, and stats by type, varietal, style, country, region and vintage.
