@@ -58,6 +58,7 @@ h2 { font-family: var(--display); font-size: 1.45rem; font-weight: 500; margin: 
 .page-intro { margin-bottom: 1.75rem; }
 .page-intro p { margin: 0.5rem 0 0; }
 .page-intro.split { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; }
+.intro-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: flex-end; }
 
 /* Controls */
 button, .button {

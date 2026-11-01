@@ -52,6 +52,11 @@ export const useImportWines = () =>
     request<Wine[]>('/api/wines/import', { method: 'POST', body: JSON.stringify(rows) }),
   )
 
+export const useImportCellar = () =>
+  useWinesMutation(async (file: File) =>
+    request<{ imported: number }>('/api/cellar/import', { method: 'POST', body: await file.text() }),
+  )
+
 export const useDrinkOne = () =>
   useWinesMutation((wine: Wine) =>
     request<Wine>(`/api/wines/${wine.id}`, {
