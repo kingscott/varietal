@@ -1,5 +1,17 @@
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { app, BrowserWindow, dialog, shell } from 'electron'
+import { normalizeWine } from '../shared/normalize.ts'
+
+// `pnpm electron` runs from its own profile, so it never shares a cellar or the single-instance lock with an installed app.
+if (!app.isPackaged) app.setPath('userData', join(app.getPath('appData'), 'Varietal Demo'))
+
+async function seedDemoCellar() {
+  // Imported here because the server's database reads DB_PATH on import.
+  const { createWines } = await import('../server/db.ts')
+  const wines = JSON.parse(readFileSync(join(app.getAppPath(), 'electron/demo-wines.json'), 'utf8'))
+  createWines(wines.map(normalizeWine))
+}
 
 function openExternal(url: string) {
   if (/^https?:/.test(url)) void shell.openExternal(url)
@@ -27,7 +39,9 @@ async function start() {
   process.env.PORT = '0'
   process.env.DB_PATH = join(app.getPath('userData'), 'cellar.db')
   process.env.STATIC_ROOT = join(app.getAppPath(), 'dist')
+  const seed = !app.isPackaged && !existsSync(process.env.DB_PATH)
   const { listening } = await import('../server/index.ts')
+  if (seed) await seedDemoCellar()
   const url = `http://127.0.0.1:${await listening}`
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) void openWindow(url)

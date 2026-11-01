@@ -52,6 +52,8 @@ pnpm run package         # build an installer for this OS into release/
 
 The desktop app keeps its cellar in the OS app data folder rather than `data/cellar.db`.
 
+`pnpm electron` doesn't touch an installed app's cellar. It runs from its own `Varietal Demo` app data folder, with a cellar filled from `electron/demo-wines.json` on first launch, and can run alongside the installed app. Delete that folder to start over, and run `node electron/fetch-demo-wines.ts` to refresh the wines from Vivino. Packaged builds, including releases, start with an empty cellar as usual.
+
 Publishing a GitHub release builds the Linux, macOS and Windows apps and attaches them to the release. The app version comes from the release tag, so tag releases like `v1.2.3`. Merges to `main` don't trigger a build. The builds aren't signed with a developer certificate, so macOS and Windows warn on first launch.
 
 ## Layout
