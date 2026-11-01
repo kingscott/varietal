@@ -60,7 +60,10 @@ export function Cellar() {
             {rows.length} {rows.length === 1 ? 'wine' : 'wines'} · {bottles} {bottles === 1 ? 'bottle' : 'bottles'}
           </p>
         </div>
-        <Link className="button primary" to="/add">Add wine</Link>
+        <div className="intro-actions">
+          <a className="button" href="/api/cellar/export" download>Export cellar</a>
+          <Link className="button primary" to="/add">Add wine</Link>
+        </div>
       </header>
       <div className="filters">
         <label className="search">

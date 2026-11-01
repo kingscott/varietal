@@ -8,6 +8,7 @@ A personal wine cellar tracker. Look wines up on the web, keep track of bottles,
 - **Add wine**: search the web (Vivino's catalogue) to fill in producer, region, grapes, type, rating and label image.
 - **Drinking windows**: every wine gets an estimated window from its appellation, grapes, type and quality (rating or price), with the reasoning shown. Enter your own window to override it.
 - **Import**: bring in an existing spreadsheet as CSV. Columns are matched automatically, and windows like `2025-2035`, `2025-30`, `by 2030` or `2028+` are kept. Map a finished column to import wines you've already finished.
+- **Export**: download your whole cellar as a JSON file from the Cellar page, and bring it into another Varietal instance from the Import page. Importing replaces everything in the receiving cellar. Label images stay as links rather than being copied into the file.
 
 ## Running it
 
@@ -57,8 +58,8 @@ Publishing a GitHub release builds the Linux, macOS and Windows apps and attache
 ## Layout
 
 - `server/`: Hono API, SQLite storage, and wine lookup
-- `shared/`: drink window estimator, grape catalogue, and input normalization, shared by client and server
+- `shared/`: drink window estimator, grape catalogue, input normalization, and the cellar export format, shared by client and server
 - `src/`: React app using TanStack Router (pages and URLs) and TanStack Query (data loading and saving)
 - `electron/`: desktop shell that runs the server and opens it in a window
 
-`pnpm test` runs the estimator and import-parsing tests.
+`pnpm test` runs the estimator, import-parsing and cellar export tests.

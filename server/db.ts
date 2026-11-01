@@ -1,6 +1,7 @@
 import { mkdirSync } from 'node:fs'
 import { dirname } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
+import type { ExportedWine } from '../shared/cellarExport.ts'
 import type { Wine, WineInput } from '../shared/types.ts'
 
 const path = process.env.DB_PATH ?? 'data/cellar.db'
@@ -77,9 +78,24 @@ const columnList = Object.values(COLUMNS)
 const insert = db.prepare(
   `INSERT INTO wines (${columnList.join(', ')}) VALUES (${columnList.map((c) => `:${c}`).join(', ')}) RETURNING *`,
 )
+const restore = db.prepare(
+  `INSERT INTO wines (${columnList.join(', ')}, created_at) VALUES (${columnList.map((c) => `:${c}`).join(', ')}, COALESCE(:created_at, datetime('now')))`,
+)
 const update = db.prepare(
   `UPDATE wines SET ${columnList.map((c) => `${c} = :${c}`).join(', ')} WHERE id = :id RETURNING *`,
 )
+
+function transaction<T>(run: () => T): T {
+  db.exec('BEGIN')
+  try {
+    const result = run()
+    db.exec('COMMIT')
+    return result
+  } catch (error) {
+    db.exec('ROLLBACK')
+    throw error
+  }
+}
 
 export function listWines(): Wine[] {
   return (db.prepare('SELECT * FROM wines ORDER BY producer, name, vintage').all() as Row[]).map(fromRow)
@@ -90,15 +106,15 @@ export function createWine(input: WineInput): Wine {
 }
 
 export function createWines(inputs: WineInput[]): Wine[] {
-  db.exec('BEGIN')
-  try {
-    const wines = inputs.map(createWine)
-    db.exec('COMMIT')
-    return wines
-  } catch (error) {
-    db.exec('ROLLBACK')
-    throw error
-  }
+  return transaction(() => inputs.map(createWine))
+}
+
+/** Replace the whole cellar; a failure partway leaves the old one untouched. */
+export function replaceCellar(wines: ExportedWine[]): void {
+  transaction(() => {
+    db.exec('DELETE FROM wines')
+    for (const wine of wines) restore.run({ ...toParams(wine), created_at: wine.createdAt })
+  })
 }
 
 export function updateWine(id: number, input: WineInput): Wine | undefined {

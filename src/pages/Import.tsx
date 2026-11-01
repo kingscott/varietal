@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { drinkWindow, windowStatus } from '../../shared/drinkWindow.ts'
 import { normalizeWine, parseWindow } from '../../shared/normalize.ts'
 import { WINE_TYPE_LABELS } from '../../shared/types.ts'
-import { useImportWines } from '../api.ts'
+import { useImportCellar, useImportWines } from '../api.ts'
 import { StatusBadge, wineTitle } from '../components/WineCard.tsx'
 
 // Matched against spreadsheet headers in this order; each column is used once.
@@ -56,6 +56,45 @@ function toRaw(row: Record<string, string>, mapping: Mapping): Record<string, un
     delete raw.drinkWindow
   }
   return raw
+}
+
+const plural = (count: number) => `${count} ${count === 1 ? 'wine' : 'wines'}`
+
+function ImportCellar() {
+  const [status, setStatus] = useState<{ text: string; failed?: boolean } | null>(null)
+  const importCellar = useImportCellar()
+
+  const load = (file: File) => {
+    if (!confirm(`Replace everything in this cellar with ${file.name}? This can’t be undone.`)) return
+    setStatus(null)
+    importCellar.mutate(file, {
+      onSuccess: ({ imported }) => setStatus({ text: `Imported ${plural(imported)}.` }),
+      onError: (err) => setStatus({ text: `Import failed: ${err.message}`, failed: true }),
+    })
+  }
+
+  return (
+    <section className="panel">
+      <h3 className="panel-title">Moving from another Varietal</h3>
+      <p className="muted">
+        Use Export cellar on the Cellar page of the other instance, then choose that file here. It replaces everything
+        in this cellar, so export this one first if you might want it back.
+      </p>
+      <label className="file-drop">
+        <input
+          type="file"
+          accept=".json,application/json"
+          disabled={importCellar.isPending}
+          onChange={(e) => {
+            if (e.target.files?.[0]) load(e.target.files[0])
+            e.target.value = ''
+          }}
+        />
+        <span>{importCellar.isPending ? 'Importing…' : 'Choose a Varietal export'}</span>
+      </label>
+      {status && <p className={status.failed ? 'error' : 'success'}>{status.text}</p>}
+    </section>
+  )
 }
 
 export function Import() {
@@ -179,6 +218,8 @@ export function Import() {
           </div>
         </>
       )}
+
+      <ImportCellar />
     </div>
   )
 }

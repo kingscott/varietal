@@ -2,8 +2,9 @@ import { join } from 'node:path'
 import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
+import { createCellarExport, parseCellarExport } from '../shared/cellarExport.ts'
 import { normalizeWine } from '../shared/normalize.ts'
-import { closeDb, createWine, createWines, deleteWine, listWines, updateWine } from './db.ts'
+import { closeDb, createWine, createWines, deleteWine, listWines, replaceCellar, updateWine } from './db.ts'
 import { searchWines } from './vivino.ts'
 
 const app = new Hono()
@@ -36,6 +37,23 @@ app.put('/api/wines/:id', async (c) => {
 })
 
 app.delete('/api/wines/:id', (c) => (deleteWine(Number(c.req.param('id'))) ? c.body(null, 204) : c.notFound()))
+
+app.get('/api/cellar/export', (c) => {
+  const file = createCellarExport(listWines())
+  c.header('Content-Disposition', `attachment; filename="varietal-cellar-${file.exportedAt.slice(0, 10)}.json"`)
+  return c.json(file)
+})
+
+app.post('/api/cellar/import', async (c) => {
+  let wines
+  try {
+    wines = parseCellarExport(await c.req.text())
+  } catch (error) {
+    return c.json({ error: (error as Error).message }, 400)
+  }
+  replaceCellar(wines)
+  return c.json({ imported: wines.length }, 201)
+})
 
 app.get('/api/lookup', async (c) => {
   const q = c.req.query('q')?.trim()
