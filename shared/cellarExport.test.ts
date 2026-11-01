@@ -68,6 +68,8 @@ describe('cellar export', () => {
     ['a different JSON file', '{"wines":[]}'],
     ['null', 'null'],
     ['missing wines', '{"app":"varietal","version":1}'],
+    ['a missing version', '{"app":"varietal","wines":[]}'],
+    ['an older version', '{"app":"varietal","version":0,"wines":[]}'],
     ['wines that aren’t objects', '{"app":"varietal","version":1,"wines":[null]}'],
   ])('rejects %s', (_, text) => {
     expect(() => parseCellarExport(text)).toThrow('isn’t a Varietal cellar export')

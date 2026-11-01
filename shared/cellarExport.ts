@@ -39,9 +39,9 @@ export function parseCellarExport(text: string): ExportedWine[] {
     throw new Error(NOT_AN_EXPORT)
   }
   if (data?.app !== 'varietal') throw new Error(NOT_AN_EXPORT)
-  if (data.version !== VERSION) throw new Error('That export is from a newer version of Varietal. Update this one first.')
+  if (data.version > VERSION) throw new Error('That export is from a newer version of Varietal. Update this one first.')
   const isRecord = (w: unknown) => typeof w === 'object' && w !== null && !Array.isArray(w)
-  if (!Array.isArray(data.wines) || !data.wines.every(isRecord)) throw new Error(NOT_AN_EXPORT)
+  if (data.version !== VERSION || !Array.isArray(data.wines) || !data.wines.every(isRecord)) throw new Error(NOT_AN_EXPORT)
   return (data.wines as Record<string, unknown>[]).map((raw) => ({
     ...normalizeWine(raw),
     // Same shape as SQLite's datetime('now'), which the cellar's sort by date relies on.

@@ -1,11 +1,10 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
 import Papa from 'papaparse'
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { drinkWindow, windowStatus } from '../../shared/drinkWindow.ts'
 import { normalizeWine, parseWindow } from '../../shared/normalize.ts'
 import { WINE_TYPE_LABELS } from '../../shared/types.ts'
-import { useImportCellar, useImportWines, winesQuery } from '../api.ts'
+import { useImportCellar, useImportWines } from '../api.ts'
 import { StatusBadge, wineTitle } from '../components/WineCard.tsx'
 
 // Matched against spreadsheet headers in this order; each column is used once.
@@ -63,11 +62,10 @@ const plural = (count: number) => `${count} ${count === 1 ? 'wine' : 'wines'}`
 
 function ImportCellar() {
   const [status, setStatus] = useState<{ text: string; failed?: boolean } | null>(null)
-  const { data: wines } = useSuspenseQuery(winesQuery)
   const importCellar = useImportCellar()
 
   const load = (file: File) => {
-    if (wines.length > 0 && !window.confirm(`Replace the ${plural(wines.length)} in this cellar with ${file.name}? This can’t be undone.`)) return
+    if (!confirm(`Replace everything in this cellar with ${file.name}? This can’t be undone.`)) return
     setStatus(null)
     importCellar.mutate(file, {
       onSuccess: ({ imported }) => setStatus({ text: `Imported ${plural(imported)}.` }),
