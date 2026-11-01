@@ -2,8 +2,11 @@ services:
   varietal:
     build: .
     image: varietal
+    init: true
     ports:
-      - "3000:3000"
+      # Loopback only: the API has no authentication. To expose it on your
+      # network, change this to "3000:3000" (and put auth or a proxy in front).
+      - "127.0.0.1:3000:3000"
     volumes:
       - varietal-data:/app/data
     restart: unless-stopped
