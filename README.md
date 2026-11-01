@@ -33,7 +33,15 @@ Your cellar is stored in `data/cellar.db` (SQLite). Set `DB_PATH` to keep it els
 docker compose up -d --build       # or: docker build -t varietal . && docker run -p 127.0.0.1:3000:3000 -v varietal:/app/data varietal
 ```
 
-The app is served on port 3000, bound to localhost only because the API has no authentication. To expose it on your network, change the port mapping in `docker-compose.yml` to `"3000:3000"` (and put auth or a reverse proxy in front). The SQLite database lives in the `varietal-data` volume mounted at `/app/data`, so your cellar survives container upgrades. The container runs as an unprivileged user (uid/gid 1000); if you bind-mount a host directory instead of a named volume, make sure it's writable by uid 1000 (e.g. `chown 1000:1000 /path/to/data`).
+The app is served on `http://127.0.0.1:3000` by default. The API has no authentication, so it's bound to localhost only. Change the host port and interface with `VARIETAL_PORT` and `VARIETAL_BIND`, either inline or in a `.env` file next to `docker-compose.yml`:
+
+```sh
+VARIETAL_PORT=8080 VARIETAL_BIND=0.0.0.0 docker compose up -d   # reachable on your LAN at :8080
+```
+
+Only bind to `0.0.0.0` on a trusted network, or put a reverse proxy with auth in front. Inside the container the app always listens on 3000.
+
+The SQLite database lives in the `varietal-data` volume mounted at `/app/data`, so your cellar survives container upgrades. The container runs as an unprivileged user (uid/gid 1000); if you bind-mount a host directory instead of a named volume, make sure it's writable by uid 1000 (e.g. `chown 1000:1000 /path/to/data`).
 
 ## Layout
 
