@@ -23,7 +23,7 @@ const FIELDS = [
   { key: 'style', label: 'Style', pattern: /style/i },
   { key: 'region', label: 'Region', pattern: /region|appellation|\bava\b|area/i },
   { key: 'country', label: 'Country', pattern: /country/i },
-  { key: 'quantity', label: 'Bottles', pattern: /qty|quantity|bottles|count|^#$|number/i },
+  { key: 'quantity', label: 'Bottles / count', pattern: /qty|quantity|bottles|\bcount\b|^#$|number/i },
   { key: 'location', label: 'Location / bin', pattern: /location|bin|rack|shelf|slot/i },
   { key: 'notes', label: 'Notes', pattern: /note|comment|remark/i },
 ] as const
@@ -101,7 +101,8 @@ export function Import() {
       </header>
       <p className="muted">
         Export your sheet as CSV (Google Sheets: File → Download → CSV; Excel or Numbers: Export → CSV), then choose the
-        file. One row per wine; a bottle count column is optional. Drink windows you already have are kept as-is, and
+        file. One row per wine; a bottle count column is optional, and takes numbers or values like “1 case” (12 bottles)
+        or “case of 6”. Drink windows you already have are kept as-is, and
         wines without one get an estimate. Anything in a finished column (a checkmark, “yes”, a date) imports the wine
         as finished, with zero bottles; blank or “no” leaves it in the cellar.
       </p>

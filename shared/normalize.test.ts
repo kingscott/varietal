@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeWine, parseDate, parseFinished, parseWindow } from './normalize.ts'
+import { normalizeWine, parseDate, parseFinished, parseQuantity, parseWindow } from './normalize.ts'
 
 describe('parseWindow', () => {
   it.each([
@@ -25,6 +25,39 @@ describe('parseDate', () => {
     ['', null],
   ])('%s', (input, expected) => {
     expect(parseDate(input)).toBe(expected)
+  })
+})
+
+describe('parseQuantity', () => {
+  it.each([
+    ['12', 12],
+    [12, 12],
+    ['0', 0],
+    ['12 bottles', 12],
+    ['6-pack', 6],
+    ['x12', 12],
+    ['12 x 750ml', 12],
+    ['6 x 1.5L', 6],
+    ['Case', 12],
+    ['1 case', 12],
+    ['2 cases', 24],
+    ['2 x case', 24],
+    ['case of 6', 6],
+    ['2 cases of 6', 12],
+    ['6 bottle case', 6],
+    ['6-pack case', 6],
+    ['half case', 6],
+    ['half-case', 6],
+    ['dozen', 12],
+    ['half dozen', 6],
+    ['1 case + 3', 15],
+    ['1 case + 3 bottles', 15],
+    ['', null],
+    ['-', null],
+    ['750ml', null],
+    ['some', null],
+  ])('%s', (input, expected) => {
+    expect(parseQuantity(input)).toBe(expected)
   })
 })
 
@@ -66,6 +99,11 @@ describe('normalizeWine', () => {
   it('sets finished wines to zero bottles, whatever the bottle count says', () => {
     expect(normalizeWine({ producer: 'Ridge', quantity: '3', finished: 'yes' }).quantity).toBe(0)
     expect(normalizeWine({ producer: 'Ridge', finished: '2024-03-15' }).quantity).toBe(0)
+  })
+
+  it('counts a case of wine as its bottles, unless it is finished', () => {
+    expect(normalizeWine({ producer: 'Ridge', quantity: '1 case' }).quantity).toBe(12)
+    expect(normalizeWine({ producer: 'Ridge', quantity: '1 case', finished: 'yes' }).quantity).toBe(0)
   })
 
   it('keeps the bottle count when a wine is not finished', () => {
