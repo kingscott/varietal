@@ -43,10 +43,22 @@ Only bind to `0.0.0.0` on a trusted network, or put a reverse proxy with auth in
 
 The SQLite database lives in the `varietal-data` volume mounted at `/app/data`, so your cellar survives container upgrades. The container runs as an unprivileged user (uid/gid 1000); if you bind-mount a host directory instead of a named volume, make sure it's writable by uid 1000 (e.g. `chown 1000:1000 /path/to/data`).
 
+## Desktop app
+
+```sh
+pnpm electron            # run the desktop app locally
+pnpm run package         # build an installer for this OS into release/
+```
+
+The desktop app keeps its cellar in the OS app data folder rather than `data/cellar.db`.
+
+Publishing a GitHub release builds the Linux, macOS and Windows apps and attaches them to the release. The app version comes from the release tag, so tag releases like `v1.2.3`. Merges to `main` don't trigger a build. The builds aren't signed with a developer certificate, so macOS and Windows warn on first launch.
+
 ## Layout
 
 - `server/`: Hono API, SQLite storage, and wine lookup
 - `shared/`: drink window estimator, grape catalogue, and input normalization, shared by client and server
 - `src/`: React app using TanStack Router (pages and URLs) and TanStack Query (data loading and saving)
+- `electron/`: desktop shell that runs the server and opens it in a window
 
 `pnpm test` runs the estimator and import-parsing tests.

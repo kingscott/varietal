@@ -1,0 +1,19 @@
+appId: ca.kingscott.varietal
+directories:
+  output: release
+files:
+  - dist/**
+  - dist-electron/**
+  - "!node_modules/**"
+npmRebuild: false
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+linux:
+  target: AppImage
+  category: Utility
+mac:
+  target: dmg
+  category: public.app-category.lifestyle
+  identity: "-"
+  hardenedRuntime: false
+win:
+  target: nsis

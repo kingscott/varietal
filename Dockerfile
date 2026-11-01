@@ -9,7 +9,7 @@ FROM ${NODE_IMAGE} AS base
 ARG PNPM_VERSION
 RUN npm install -g pnpm@${PNPM_VERSION}
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # ---- Production dependencies only ----
 FROM base AS prod-deps

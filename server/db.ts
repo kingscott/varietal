@@ -6,7 +6,7 @@ import type { Wine, WineInput } from '../shared/types.ts'
 const path = process.env.DB_PATH ?? 'data/cellar.db'
 if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true })
 
-const db = new DatabaseSync(path)
+const db = new DatabaseSync(path, { timeout: 5000 })
 db.exec(`
   CREATE TABLE IF NOT EXISTS wines (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

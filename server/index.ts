@@ -1,3 +1,4 @@
+import { join } from 'node:path'
 import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
@@ -6,6 +7,17 @@ import { closeDb, createWine, createWines, deleteWine, listWines, updateWine } f
 import { searchWines } from './vivino.ts'
 
 const app = new Hono()
+const desktop = Boolean(process.env.VARIETAL_DESKTOP)
+
+// Any website can send requests to a local server, so the desktop app only accepts its own window's.
+if (desktop) {
+  app.use('*', async (c, next) => {
+    const host = c.req.header('host') ?? ''
+    const origin = c.req.header('origin')
+    const allowed = /^127\.0\.0\.1:\d+$/.test(host) && (origin === undefined || origin === `http://${host}`)
+    return allowed ? next() : c.text('Forbidden', 403)
+  })
+}
 
 app.get('/healthz', (c) => c.text('ok'))
 
@@ -36,12 +48,20 @@ app.get('/api/lookup', async (c) => {
 })
 
 if (process.env.NODE_ENV === 'production') {
-  app.use('/*', serveStatic({ root: './dist' }))
-  app.get('*', serveStatic({ path: './dist/index.html' }))
+  const root = process.env.STATIC_ROOT ?? './dist'
+  app.use('/*', serveStatic({ root }))
+  app.get('*', serveStatic({ path: join(root, 'index.html') }))
 }
 
 const port = Number(process.env.PORT ?? (process.env.NODE_ENV === 'production' ? 3000 : 3001))
-const server = serve({ fetch: app.fetch, port }, () => console.log(`Varietal server on http://localhost:${port}`))
+let resolveListening: (port: number) => void
+export const listening = new Promise<number>((resolve) => {
+  resolveListening = resolve
+})
+const server = serve({ fetch: app.fetch, port, hostname: desktop ? '127.0.0.1' : undefined }, (info) => {
+  console.log(`Varietal server on http://localhost:${info.port}`)
+  resolveListening(info.port)
+})
 
 // Close cleanly on `docker stop` (SIGTERM) and Ctrl-C so in-flight requests finish and SQLite is closed.
 for (const signal of ['SIGTERM', 'SIGINT'] as const) {
