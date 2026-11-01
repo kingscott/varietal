@@ -169,6 +169,10 @@ a.stat:hover { border-color: #5a5048; }
 
 .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
 .section-head h2 { margin-bottom: 1rem; }
+.segmented { display: inline-flex; gap: 0.25rem; padding: 0.2rem; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); }
+.segmented button { border-color: transparent; background: transparent; color: var(--muted); }
+.segmented button[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.tonight .section-head { align-items: center; flex-wrap: wrap; }
 .more { color: var(--muted); text-decoration: none; font-size: 0.9rem; }
 .more:hover { color: var(--accent); }
 .shelf { display: grid; grid-auto-flow: column; grid-auto-columns: 168px; gap: 0.75rem; overflow-x: auto; padding-bottom: 0.75rem; scroll-snap-type: x mandatory; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
