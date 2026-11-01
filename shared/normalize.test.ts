@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeWine, parseDate, parseWindow } from './normalize.ts'
+import { normalizeWine, parseDate, parseFinished, parseWindow } from './normalize.ts'
 
 describe('parseWindow', () => {
   it.each([
@@ -28,7 +28,39 @@ describe('parseDate', () => {
   })
 })
 
+describe('parseFinished', () => {
+  it.each([
+    ['yes', true],
+    ['Y', true],
+    ['TRUE', true],
+    ['x', true],
+    ['✓', true],
+    ['1', true],
+    ['2024-03-15', true],
+    ['', false],
+    ['  ', false],
+    ['No', false],
+    ['FALSE', false],
+    ['0', false],
+    ['-', false],
+    ['n/a', false],
+    [undefined, false],
+  ])('%s', (input, expected) => {
+    expect(parseFinished(input)).toBe(expected)
+  })
+})
+
 describe('normalizeWine', () => {
+  it('sets finished wines to zero bottles, whatever the bottle count says', () => {
+    expect(normalizeWine({ producer: 'Ridge', quantity: '3', finished: 'yes' }).quantity).toBe(0)
+    expect(normalizeWine({ producer: 'Ridge', finished: '2024-03-15' }).quantity).toBe(0)
+  })
+
+  it('keeps the bottle count when a wine is not finished', () => {
+    expect(normalizeWine({ producer: 'Ridge', quantity: '3', finished: 'no' }).quantity).toBe(3)
+    expect(normalizeWine({ producer: 'Ridge', finished: '' }).quantity).toBe(1)
+  })
+
   it('cleans up a typical spreadsheet row', () => {
     const wine = normalizeWine({
       producer: ' Ridge ',

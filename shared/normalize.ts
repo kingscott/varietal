@@ -72,8 +72,13 @@ export function parseDate(v: unknown): string | null {
   return y ? `${y}-01-01` : null
 }
 
+/** A finished column may hold a checkmark, "yes" or the date it was finished; blank or a negative means no. */
+export function parseFinished(v: unknown): boolean {
+  return !/^(|no?|f|false|0|-+|–|—|n\/?a|none|not finished|unfinished)$/i.test(str(v))
+}
+
 export function normalizeWine(raw: Record<string, unknown>): WineInput {
-  const quantity = num(raw.quantity)
+  const quantity = parseFinished(raw.finished) ? 0 : num(raw.quantity)
   const varietals = parseVarietals(raw.varietals)
   // Spreadsheets often put "Red"/"Sparkling" in the style column instead of a type column.
   const grapeStyle = findGrape(varietals[0] ?? '')?.style

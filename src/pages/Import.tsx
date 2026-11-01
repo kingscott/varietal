@@ -9,6 +9,7 @@ import { StatusBadge, wineTitle } from '../components/WineCard.tsx'
 
 // Matched against spreadsheet headers in this order; each column is used once.
 const FIELDS = [
+  { key: 'finished', label: 'Finished', pattern: /finished|consumed|drunk|drank/i },
   { key: 'drinkFrom', label: 'Drink from', pattern: /drink.*(from|after|start)|ready|window.*(start|from|open)/i },
   { key: 'drinkTo', label: 'Drink until', pattern: /drink.*(to|by|until|before|end)|window.*(end|to|close)/i },
   { key: 'drinkWindow', label: 'Drink window (e.g. 2025–2035)', pattern: /window|drink/i },
@@ -101,7 +102,8 @@ export function Import() {
       <p className="muted">
         Export your sheet as CSV (Google Sheets: File → Download → CSV; Excel or Numbers: Export → CSV), then choose the
         file. One row per wine; a bottle count column is optional. Drink windows you already have are kept as-is, and
-        wines without one get an estimate.
+        wines without one get an estimate. Anything in a finished column (a checkmark, “yes”, a date) imports the wine
+        as finished, with zero bottles; blank or “no” leaves it in the cellar.
       </p>
       <label className="file-drop">
         <input type="file" accept=".csv,text/csv" onChange={(e) => e.target.files?.[0] && load(e.target.files[0])} />
