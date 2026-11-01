@@ -185,6 +185,7 @@ export function Import() {
                     <th>Style</th>
                     <th>Bottles</th>
                     <th>Purchased</th>
+                    <th>Price</th>
                     <th>Window</th>
                   </tr>
                 </thead>
@@ -199,6 +200,7 @@ export function Import() {
                         <td>{w.style}</td>
                         <td>{w.quantity}</td>
                         <td>{w.purchaseDate}</td>
+                        <td>{w.purchasePrice === null ? '' : `$${w.purchasePrice.toLocaleString()}`}</td>
                         <td className="nowrap">
                           {dw.from}–{dw.to} {dw.source === 'estimate' && <span className="muted">est.</span>}{' '}
                           <StatusBadge status={windowStatus(dw)} />
