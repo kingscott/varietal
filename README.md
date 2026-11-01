@@ -36,7 +36,7 @@ pnpm run package         # build an installer for this OS into release/
 
 The desktop app keeps its cellar in the OS app data folder rather than `data/cellar.db`.
 
-Publishing a GitHub release builds the Linux, macOS and Windows apps and attaches them to the release. The app version comes from the release tag, so tag releases like `v1.2.3`. Merges to `main` don't trigger a build. The builds are unsigned, so macOS and Windows warn on first launch.
+Publishing a GitHub release builds the Linux, macOS and Windows apps and attaches them to the release. The app version comes from the release tag, so tag releases like `v1.2.3`. Merges to `main` don't trigger a build. The builds aren't signed with a developer certificate, so macOS and Windows warn on first launch.
 
 ## Layout
 

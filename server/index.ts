@@ -7,6 +7,17 @@ import { createWine, createWines, deleteWine, listWines, updateWine } from './db
 import { searchWines } from './vivino.ts'
 
 const app = new Hono()
+const desktop = Boolean(process.env.VARIETAL_DESKTOP)
+
+// Any website can send requests to a local server, so the desktop app only accepts its own window's.
+if (desktop) {
+  app.use('*', async (c, next) => {
+    const host = c.req.header('host') ?? ''
+    const origin = c.req.header('origin')
+    const allowed = /^127\.0\.0\.1:\d+$/.test(host) && (origin === undefined || origin === `http://${host}`)
+    return allowed ? next() : c.text('Forbidden', 403)
+  })
+}
 
 app.get('/api/wines', (c) => c.json(listWines()))
 
@@ -42,7 +53,7 @@ if (process.env.NODE_ENV === 'production') {
 
 const port = Number(process.env.PORT ?? (process.env.NODE_ENV === 'production' ? 3000 : 3001))
 export const listening = new Promise<number>((resolve) => {
-  serve({ fetch: app.fetch, port, hostname: process.env.HOST }, (info) => {
+  serve({ fetch: app.fetch, port, hostname: desktop ? '127.0.0.1' : undefined }, (info) => {
     console.log(`Varietal server on http://localhost:${info.port}`)
     resolve(info.port)
   })

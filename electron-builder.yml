@@ -13,5 +13,7 @@ linux:
 mac:
   target: dmg
   category: public.app-category.lifestyle
+  identity: "-"
+  hardenedRuntime: false
 win:
   target: nsis
