@@ -9,6 +9,7 @@ import { StatusBadge, wineTitle } from '../components/WineCard.tsx'
 
 // Matched against spreadsheet headers in this order; each column is used once.
 const FIELDS = [
+  { key: 'finished', label: 'Finished', pattern: /finished|consumed|drunk|drank/i },
   { key: 'drinkFrom', label: 'Drink from', pattern: /drink.*(from|after|start)|ready|window.*(start|from|open)/i },
   { key: 'drinkTo', label: 'Drink until', pattern: /drink.*(to|by|until|before|end)|window.*(end|to|close)/i },
   { key: 'drinkWindow', label: 'Drink window (e.g. 2025–2035)', pattern: /window|drink/i },
@@ -22,7 +23,7 @@ const FIELDS = [
   { key: 'style', label: 'Style', pattern: /style/i },
   { key: 'region', label: 'Region', pattern: /region|appellation|\bava\b|area/i },
   { key: 'country', label: 'Country', pattern: /country/i },
-  { key: 'quantity', label: 'Bottles', pattern: /qty|quantity|bottles|count|^#$|number/i },
+  { key: 'quantity', label: 'Bottles / count', pattern: /qty|quantity|bottles|\bcount\b|^#$|number/i },
   { key: 'location', label: 'Location / bin', pattern: /location|bin|rack|shelf|slot/i },
   { key: 'notes', label: 'Notes', pattern: /note|comment|remark/i },
 ] as const
@@ -100,8 +101,10 @@ export function Import() {
       </header>
       <p className="muted">
         Export your sheet as CSV (Google Sheets: File → Download → CSV; Excel or Numbers: Export → CSV), then choose the
-        file. One row per wine; a bottle count column is optional. Drink windows you already have are kept as-is, and
-        wines without one get an estimate.
+        file. One row per wine; a bottle count column is optional, and takes numbers or values like “1 case” (12 bottles)
+        or “case of 6”. Drink windows you already have are kept as-is, and
+        wines without one get an estimate. Anything in a finished column (a checkmark, “yes”, a date) imports the wine
+        as finished, with zero bottles; blank or “no” leaves it in the cellar.
       </p>
       <label className="file-drop">
         <input type="file" accept=".csv,text/csv" onChange={(e) => e.target.files?.[0] && load(e.target.files[0])} />

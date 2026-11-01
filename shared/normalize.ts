@@ -72,8 +72,30 @@ export function parseDate(v: unknown): string | null {
   return y ? `${y}-01-01` : null
 }
 
+const CASES = /(?:(\d+)\s*(?:x\s*)?)?(half[- ]?)?(?:(\d+)[- ]?(?:bottles?|pack)[- ])?(?:cases?|dozen)(?:\s+of\s+(\d+))?/gi
+
+/** Parse bottle counts like "12", "12 bottles", "6-pack", "12 x 750ml", "1 case", "2 cases of 6" or "1 case + 3". */
+export function parseQuantity(v: unknown): number | null {
+  const n = num(v)
+  if (n !== null) return n
+  let total = 0
+  const rest = str(v)
+    .replace(/\d+(\.\d+)?\s*(ml|cl|l|lit(er|re)s?)\b/gi, ' ')
+    .replace(CASES, (_, cases, half, size, sizeOf) => {
+      total += Number(cases ?? 1) * Number(size ?? sizeOf ?? (half ? 6 : 12))
+      return ' '
+    })
+  const loose = rest.match(/\d+/)
+  return total > 0 || loose ? total + Number(loose?.[0] ?? 0) : null
+}
+
+/** A finished column may hold a checkmark, "yes" or the date it was finished; blank or a negative means no. */
+export function parseFinished(v: unknown): boolean {
+  return !/^(|no?\.?|nope|never|not\b.*|unfinished|f|false|0+(\.0+)?|-+|–|—|n[/.]?a\.?|none|[✗✘❌])$/i.test(str(v))
+}
+
 export function normalizeWine(raw: Record<string, unknown>): WineInput {
-  const quantity = num(raw.quantity)
+  const quantity = parseFinished(raw.finished) ? 0 : parseQuantity(raw.quantity)
   const varietals = parseVarietals(raw.varietals)
   // Spreadsheets often put "Red"/"Sparkling" in the style column instead of a type column.
   const grapeStyle = findGrape(varietals[0] ?? '')?.style
