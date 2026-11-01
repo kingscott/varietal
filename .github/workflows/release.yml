@@ -1,0 +1,38 @@
+name: Electron release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      TAG: ${{ github.event.release.tag_name }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: pnpm run package --config.extraMetadata.version="${TAG#v}"
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+      - run: |
+          shopt -s nullglob
+          gh release upload "$TAG" release/*.{AppImage,dmg,exe} --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}

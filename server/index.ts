@@ -1,3 +1,4 @@
+import { join } from 'node:path'
 import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
@@ -34,9 +35,15 @@ app.get('/api/lookup', async (c) => {
 })
 
 if (process.env.NODE_ENV === 'production') {
-  app.use('/*', serveStatic({ root: './dist' }))
-  app.get('*', serveStatic({ path: './dist/index.html' }))
+  const root = process.env.STATIC_ROOT ?? './dist'
+  app.use('/*', serveStatic({ root }))
+  app.get('*', serveStatic({ path: join(root, 'index.html') }))
 }
 
 const port = Number(process.env.PORT ?? (process.env.NODE_ENV === 'production' ? 3000 : 3001))
-serve({ fetch: app.fetch, port }, () => console.log(`Varietal server on http://localhost:${port}`))
+export const listening = new Promise<number>((resolve) => {
+  serve({ fetch: app.fetch, port, hostname: process.env.HOST }, (info) => {
+    console.log(`Varietal server on http://localhost:${info.port}`)
+    resolve(info.port)
+  })
+})

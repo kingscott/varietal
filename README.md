@@ -27,10 +27,22 @@ pnpm start               # http://localhost:3000
 
 Your cellar is stored in `data/cellar.db` (SQLite). Set `DB_PATH` to keep it elsewhere and `PORT` to change the port.
 
+## Desktop app
+
+```sh
+pnpm electron            # run the desktop app locally
+pnpm run package         # build an installer for this OS into release/
+```
+
+The desktop app keeps its cellar in the OS app data folder rather than `data/cellar.db`.
+
+Publishing a GitHub release builds the Linux, macOS and Windows apps and attaches them to the release. The app version comes from the release tag, so tag releases like `v1.2.3`. Merges to `main` don't trigger a build. The builds are unsigned, so macOS and Windows warn on first launch.
+
 ## Layout
 
 - `server/`: Hono API, SQLite storage, and wine lookup
 - `shared/`: drink window estimator, grape catalogue, and input normalization, shared by client and server
 - `src/`: React app using TanStack Router (pages and URLs) and TanStack Query (data loading and saving)
+- `electron/`: desktop shell that runs the server and opens it in a window
 
 `pnpm test` runs the estimator and import-parsing tests.
