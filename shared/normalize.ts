@@ -74,7 +74,7 @@ export function parseDate(v: unknown): string | null {
 
 /** A finished column may hold a checkmark, "yes" or the date it was finished; blank or a negative means no. */
 export function parseFinished(v: unknown): boolean {
-  return !/^(|no?|f|false|0|-+|–|—|n\/?a|none|not finished|unfinished)$/i.test(str(v))
+  return !/^(|no?\.?|nope|never|not\b.*|unfinished|f|false|0+(\.0+)?|-+|–|—|n[/.]?a\.?|none|[✗✘❌])$/i.test(str(v))
 }
 
 export function normalizeWine(raw: Record<string, unknown>): WineInput {

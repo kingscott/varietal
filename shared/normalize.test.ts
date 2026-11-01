@@ -44,6 +44,18 @@ describe('parseFinished', () => {
     ['0', false],
     ['-', false],
     ['n/a', false],
+    ['n.a.', false],
+    ['no.', false],
+    ['nope', false],
+    ['never', false],
+    ['Not yet', false],
+    ['not finished', false],
+    ['unfinished', false],
+    ['✗', false],
+    ['❌', false],
+    ['0.0', false],
+    ['finished', true],
+    ['Nov 2024', true],
     [undefined, false],
   ])('%s', (input, expected) => {
     expect(parseFinished(input)).toBe(expected)
