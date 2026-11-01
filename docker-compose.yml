@@ -1,0 +1,18 @@
+services:
+  varietal:
+    build: .
+    image: varietal
+    init: true
+    ports:
+      # Host side is configurable via a .env file or the shell:
+      #   VARIETAL_PORT=8080            host port (default 3000)
+      #   VARIETAL_BIND=0.0.0.0         interface (default 127.0.0.1, loopback only)
+      # The API has no authentication, so only widen the bind address on a
+      # trusted network or behind a reverse proxy that adds auth.
+      - "${VARIETAL_BIND:-127.0.0.1}:${VARIETAL_PORT:-3000}:3000"
+    volumes:
+      - varietal-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  varietal-data:

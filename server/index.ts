@@ -3,7 +3,7 @@ import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
 import { normalizeWine } from '../shared/normalize.ts'
-import { createWine, createWines, deleteWine, listWines, updateWine } from './db.ts'
+import { closeDb, createWine, createWines, deleteWine, listWines, updateWine } from './db.ts'
 import { searchWines } from './vivino.ts'
 
 const app = new Hono()
@@ -18,6 +18,8 @@ if (desktop) {
     return allowed ? next() : c.text('Forbidden', 403)
   })
 }
+
+app.get('/healthz', (c) => c.text('ok'))
 
 app.get('/api/wines', (c) => c.json(listWines()))
 
@@ -52,9 +54,21 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const port = Number(process.env.PORT ?? (process.env.NODE_ENV === 'production' ? 3000 : 3001))
+let resolveListening: (port: number) => void
 export const listening = new Promise<number>((resolve) => {
-  serve({ fetch: app.fetch, port, hostname: desktop ? '127.0.0.1' : undefined }, (info) => {
-    console.log(`Varietal server on http://localhost:${info.port}`)
-    resolve(info.port)
-  })
+  resolveListening = resolve
 })
+const server = serve({ fetch: app.fetch, port, hostname: desktop ? '127.0.0.1' : undefined }, (info) => {
+  console.log(`Varietal server on http://localhost:${info.port}`)
+  resolveListening(info.port)
+})
+
+// Close cleanly on `docker stop` (SIGTERM) and Ctrl-C so in-flight requests finish and SQLite is closed.
+for (const signal of ['SIGTERM', 'SIGINT'] as const) {
+  process.once(signal, () => {
+    server.close(() => {
+      closeDb()
+      process.exit(0)
+    })
+  })
+}

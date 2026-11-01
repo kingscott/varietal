@@ -109,3 +109,7 @@ export function updateWine(id: number, input: WineInput): Wine | undefined {
 export function deleteWine(id: number): boolean {
   return db.prepare('DELETE FROM wines WHERE id = ?').run(id).changes > 0
 }
+
+export function closeDb(): void {
+  db.close()
+}
