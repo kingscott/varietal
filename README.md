@@ -27,6 +27,14 @@ pnpm start               # http://localhost:3000
 
 Your cellar is stored in `data/cellar.db` (SQLite). Set `DB_PATH` to keep it elsewhere and `PORT` to change the port.
 
+## Running it with Docker
+
+```sh
+docker compose up -d --build       # or: docker build -t varietal . && docker run -p 3000:3000 -v varietal:/app/data varietal
+```
+
+The app is served on port 3000. The SQLite database lives in the `varietal-data` volume mounted at `/app/data`, so your cellar survives container upgrades. The container runs as an unprivileged user (uid/gid 1000); if you bind-mount a host directory instead of a named volume, make sure it's writable by uid 1000 (e.g. `chown 1000:1000 /path/to/data`).
+
 ## Layout
 
 - `server/`: Hono API, SQLite storage, and wine lookup

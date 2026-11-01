@@ -1,0 +1,12 @@
+services:
+  varietal:
+    build: .
+    image: varietal
+    ports:
+      - "3000:3000"
+    volumes:
+      - varietal-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  varietal-data:
