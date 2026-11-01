@@ -55,6 +55,8 @@ The desktop app keeps its cellar in the OS app data folder rather than `data/cel
 
 Publishing a GitHub release builds the Linux, macOS and Windows apps and attaches them to the release. The app version comes from the release tag, so tag releases like `v1.2.3`. Merges to `main` don't trigger a build. The builds aren't signed with a developer certificate, so macOS and Windows warn on first launch.
 
+The app icon in `build/icon.png` is the wine glass from [Noto Emoji](https://github.com/googlefonts/noto-emoji), used under the Apache License 2.0. electron-builder generates each platform's icon format from it.
+
 ## Layout
 
 - `server/`: Hono API, SQLite storage, and wine lookup
