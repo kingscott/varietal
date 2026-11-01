@@ -1,0 +1,16 @@
+.git
+.github
+.amp
+.env*
+node_modules
+dist
+dist-electron
+electron
+release
+data
+*.log
+.DS_Store
+Dockerfile
+docker-compose.yml
+.dockerignore
+README.md
