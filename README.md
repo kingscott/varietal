@@ -4,7 +4,7 @@ A free and self-hostable way to track you cellar.
 
 A personal wine cellar tracker. Look wines up on the web, keep track of bottles, and see what's in its drinking window.
 
-- **Tonight**: the bottle to open next, what else is ready to drink (most urgent first), what's coming into its window, and stats by type, varietal, style, country, region and vintage.
+- **Tonight**: the bottle to open next, what else is ready to drink (most urgent first, or switch to **Tuesday night** for in-window bottles from the cheaper end of your cellar), what's coming into its window, and stats by type, varietal, style, country, region and vintage.
 - **Add wine**: search the web (Vivino's catalogue) to fill in producer, region, grapes, type, rating and label image.
 - **Drinking windows**: every wine gets an estimated window from its appellation, grapes, type and quality (rating or price), with the reasoning shown. Enter your own window to override it.
 - **Import**: bring in an existing spreadsheet as CSV. Columns are matched automatically, and windows like `2025-2035`, `2025-30`, `by 2030` or `2028+` are kept. Map a finished column to import wines you've already finished.

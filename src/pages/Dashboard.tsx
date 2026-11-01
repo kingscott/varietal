@@ -1,7 +1,9 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
+import { useState } from 'react'
 import { STATUS_LABELS, drinkWindow, windowStatus, type WindowStatus } from '../../shared/drinkWindow.ts'
 import { WINE_TYPE_LABELS, type Wine } from '../../shared/types.ts'
+import { tuesdayNightWines } from '../../shared/tuesdayNight.ts'
 import { winesQuery } from '../api.ts'
 import { Bottle, DrinkButton, ShelfCard, StatusBadge, WindowBar, WindowYears, wineMeta, wineTitle } from '../components/WineCard.tsx'
 
@@ -42,8 +44,11 @@ const HERO_EYEBROW: Record<WindowStatus, string> = {
   'not-ready': 'Next up',
 }
 
+const SHELF_FILTERS = { ready: 'Ready now', tuesday: 'Tuesday night' } as const
+
 export function Dashboard() {
   const { data: wines } = useSuspenseQuery(winesQuery)
+  const [shelfFilter, setShelfFilter] = useState<keyof typeof SHELF_FILTERS>('ready')
   const now = new Date().getFullYear()
   const inCellar = wines
     .filter((w) => w.quantity > 0)
@@ -89,6 +94,7 @@ export function Dashboard() {
   }
   const timelineMax = Math.max(1, ...timeline.values())
   const cellarWines = inCellar.map((x) => x.wine)
+  const tuesdayNight = tuesdayNightWines(cellarWines)
 
   return (
     <div className="dashboard">
@@ -143,8 +149,33 @@ export function Dashboard() {
         </article>
 
         <section className="shelf-section">
-          <h2>{drinkNow.length > 0 ? 'More to drink now' : 'Nothing is ready yet'}</h2>
-          {shelf.length === 0 ? (
+          <div className="section-head">
+            <h2>{shelfFilter === 'tuesday' ? 'For a Tuesday night' : drinkNow.length > 0 ? 'More to drink now' : 'Nothing is ready yet'}</h2>
+            <div className="segmented" role="group" aria-label="Filter the shelf">
+              {Object.entries(SHELF_FILTERS).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  className="small"
+                  aria-pressed={shelfFilter === value}
+                  onClick={() => setShelfFilter(value as keyof typeof SHELF_FILTERS)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          {shelfFilter === 'tuesday' ? (
+            tuesdayNight.length === 0 ? (
+              <p className="muted">Nothing cheap is in its window. Tuesday night wines are in-window bottles from the lower end of your cellar’s prices.</p>
+            ) : (
+              <div className="shelf">
+                {tuesdayNight.map(({ wine }) => (
+                  <ShelfCard key={wine.id} wine={wine} />
+                ))}
+              </div>
+            )
+          ) : shelf.length === 0 ? (
             <p className="muted">{drinkNow.length > 0 ? 'That’s the only bottle in its window.' : 'Patience. The bottle on the left is next.'}</p>
           ) : (
             <div className="shelf">
