@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeWine, parseDate, parseFinished, parseQuantity, parseWindow } from './normalize.ts'
+import { normalizeWine, parseDate, parseFinished, parsePrice, parseQuantity, parseWindow } from './normalize.ts'
 
 describe('parseWindow', () => {
   it.each([
@@ -58,6 +58,33 @@ describe('parseQuantity', () => {
     ['some', null],
   ])('%s', (input, expected) => {
     expect(parseQuantity(input)).toBe(expected)
+  })
+})
+
+describe('parsePrice', () => {
+  it.each([
+    ['45', 45],
+    ['$45.00', 45],
+    ['$1,234.50', 1234.5],
+    ['1,234', 1234],
+    ['1,234,567', 1234567],
+    ['£1 234.50', 1234.5],
+    ['45,00', 45],
+    ['45,5', 45.5],
+    ['€45,50', 45.5],
+    ['1.234,50', 1234.5],
+    ['1.234,50 €', 1234.5],
+    ['0,500', 0.5],
+    ['CA$45', 45],
+    ['USD 45', 45],
+    ['45.00 CAD', 45],
+    ['$45/bottle', 45],
+    [45.5, 45.5],
+    ['', null],
+    ['-', null],
+    ['N/A', null],
+  ])('%s', (input, price) => {
+    expect(parsePrice(input)).toBe(price)
   })
 })
 
@@ -129,6 +156,12 @@ describe('normalizeWine', () => {
       purchasePrice: 45,
       quantity: 1,
     })
+  })
+
+  it('reads decimal-comma and currency-coded prices from a spreadsheet', () => {
+    expect(normalizeWine({ producer: 'Ridge', purchasePrice: '45,00' }).purchasePrice).toBe(45)
+    expect(normalizeWine({ producer: 'Ridge', purchasePrice: '1.234,50' }).purchasePrice).toBe(1234.5)
+    expect(normalizeWine({ producer: 'Ridge', purchasePrice: 'CA$45' }).purchasePrice).toBe(45)
   })
 
   it('infers type and style from the grape when the sheet has neither', () => {

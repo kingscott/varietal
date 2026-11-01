@@ -15,6 +15,30 @@ function num(v: unknown): number | null {
   return Number.isFinite(n) ? n : null
 }
 
+// A number with optional grouping (spaces, apostrophes) and a "." or "," separator.
+const PRICE = /\d{1,3}(?:[ \u00a0'\u2019]\d{3})+(?:[.,]\d+)*|\d+(?:[.,]\d+)*/
+
+/**
+ * Parse a price like "$1,234.50", "1.234,50 €", "45,00", "CA$45" or "USD 45".
+ * The last "." or "," is the decimal point when the other kind also appears or when it
+ * isn't followed by exactly three digits; otherwise it's a thousands separator, so "1,234" is 1234.
+ */
+export function parsePrice(v: unknown): number | null {
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null
+  const token = str(v).match(PRICE)?.[0].replace(/[ \u00a0'\u2019]/g, '')
+  if (!token) return null
+  const last = Math.max(token.lastIndexOf('.'), token.lastIndexOf(','))
+  if (last === -1) return Number(token)
+  const sep = token[last]
+  const before = token.slice(0, last)
+  const after = token.slice(last + 1)
+  const mixed = before.includes(sep === '.' ? ',' : '.')
+  const grouped = after.length === 3 && /^[1-9]\d{0,2}$/.test(before)
+  const isDecimal = mixed || (!before.includes(sep) && (sep === '.' || !grouped))
+  const n = Number(isDecimal ? `${before.replace(/[.,]/g, '')}.${after}` : token.replace(/[.,]/g, ''))
+  return Number.isFinite(n) ? n : null
+}
+
 function year(v: unknown): number | null {
   const match = str(v).match(/\b(1[89]\d{2}|2\d{3})\b/)
   return match ? Number(match[1]) : null
@@ -112,7 +136,7 @@ export function normalizeWine(raw: Record<string, unknown>): WineInput {
     country: str(raw.country),
     quantity: quantity === null ? 1 : Math.max(0, Math.round(quantity)),
     purchaseDate: parseDate(raw.purchaseDate),
-    purchasePrice: num(raw.purchasePrice),
+    purchasePrice: parsePrice(raw.purchasePrice),
     location: str(raw.location),
     notes: str(raw.notes),
     drinkFrom: year(raw.drinkFrom),
