@@ -19,11 +19,13 @@ export function wineMeta(wine: Pick<Wine, 'type' | 'varietals' | 'region' | 'cou
 
 /**
  * Vivino's transparent bottle shot, a framed photo of the label when that is all
- * Vivino has, or a bottle silhouette in the wine's colour.
+ * Vivino has, or a bottle silhouette in the wine's colour. Uses the server's stored
+ * copy of the image when there is one.
  */
-export function Bottle({ imageUrl, type }: { imageUrl: string | null; type: WineType }) {
-  if (imageUrl?.includes('_pb_')) return <img className="bottle" src={imageUrl} alt="" loading="lazy" referrerPolicy="no-referrer" />
-  if (imageUrl) return <img className="label-photo" src={imageUrl} alt="" loading="lazy" referrerPolicy="no-referrer" />
+export function Bottle({ imageUrl, localImageUrl, type }: { imageUrl: string | null; localImageUrl?: string | null; type: WineType }) {
+  const src = localImageUrl ?? imageUrl ?? undefined
+  if (imageUrl?.includes('_pb_')) return <img className="bottle" src={src} alt="" loading="lazy" referrerPolicy="no-referrer" />
+  if (imageUrl) return <img className="label-photo" src={src} alt="" loading="lazy" referrerPolicy="no-referrer" />
   return (
     <svg className={`bottle bottle-svg type-${type}`} viewBox="0 0 40 120" aria-hidden>
       <path d="M16 4h8v26c0 4 8 9 8 20v62a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4V50c0-11 8-16 8-20V4Z" className="glass" />
@@ -74,7 +76,7 @@ export function WineCard({ wine }: { wine: Wine }) {
     <article className={`wine-card${wine.quantity === 0 ? ' finished' : ''}`}>
       <Link to="/wine/$id" params={{ id: String(wine.id) }} className="wine-card-main">
         <div className="bottle-frame">
-          <Bottle imageUrl={wine.imageUrl} type={wine.type} />
+          <Bottle imageUrl={wine.imageUrl} localImageUrl={wine.localImageUrl} type={wine.type} />
         </div>
         <div className="wine-info">
           <h3>{wineTitle(wine)}</h3>
@@ -101,7 +103,7 @@ export function ShelfCard({ wine }: { wine: Wine }) {
     <article className="shelf-card">
       <Link to="/wine/$id" params={{ id: String(wine.id) }} className="shelf-card-main">
         <div className="bottle-frame">
-          <Bottle imageUrl={wine.imageUrl} type={wine.type} />
+          <Bottle imageUrl={wine.imageUrl} localImageUrl={wine.localImageUrl} type={wine.type} />
         </div>
         <h3>{wineTitle(wine)}</h3>
         <StatusBadge status={windowStatus(w)} />

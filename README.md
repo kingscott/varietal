@@ -22,6 +22,8 @@ Ready-to-drink wines are listed most urgent first. Switch to **Tuesday night** t
 
 Search uses Vivino's catalogue to fill in producer, region, grapes, type, rating and label image.
 
+The server downloads each label image once and stores it in an `images` folder next to the database, so browsing your cellar doesn't contact Vivino. Vivino is still contacted when you search for or add a wine, and when the server downloads a label it hasn't stored yet.
+
 ### Drinking windows
 
 The estimate is based on the wine's appellation, grapes, type and quality (rating or price). Enter your own window to override it.
@@ -32,7 +34,7 @@ Columns are matched automatically. Drinking windows written like `2025-2035`, `2
 
 ### Cellar export
 
-Download the export from the Cellar page, and bring it into another Varietal instance from the Import page. Importing replaces everything in the receiving cellar. Label images stay as links rather than being copied into the file.
+Download the export from the Cellar page, and bring it into another Varietal instance from the Import page. Importing replaces everything in the receiving cellar. The file keeps the label images' original links, and the receiving instance downloads its own copies.
 
 ## Getting started
 

@@ -127,7 +127,7 @@ export function Dashboard() {
       <div className="tonight">
         <article className="hero">
           <div className="hero-bottle">
-            <Bottle imageUrl={hero.wine.imageUrl} type={hero.wine.type} />
+            <Bottle imageUrl={hero.wine.imageUrl} localImageUrl={hero.wine.localImageUrl} type={hero.wine.type} />
           </div>
           <div className="hero-body">
             <p className="eyebrow">{HERO_EYEBROW[hero.status]}</p>

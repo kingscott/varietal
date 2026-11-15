@@ -3,6 +3,7 @@ import { dirname } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 import type { ExportedWine } from '../shared/cellarExport.ts'
 import type { Wine, WineInput } from '../shared/types.ts'
+import { localImageUrl } from './images.ts'
 
 const path = process.env.DB_PATH ?? 'data/cellar.db'
 if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true })
@@ -62,6 +63,7 @@ function fromRow(row: Row): Wine {
   const wine = { id: row.id, createdAt: row.created_at } as Record<string, unknown>
   for (const [key, column] of Object.entries(COLUMNS)) wine[key] = row[column]
   wine.varietals = JSON.parse(row.varietals as string)
+  wine.localImageUrl = localImageUrl(row.image_url as string | null)
   return wine as unknown as Wine
 }
 

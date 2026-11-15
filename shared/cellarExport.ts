@@ -26,7 +26,7 @@ export function createCellarExport(wines: Wine[]): CellarExport {
     app: 'varietal',
     version: VERSION,
     exportedAt: new Date().toISOString(),
-    wines: wines.map(({ id: _id, ...wine }) => wine),
+    wines: wines.map(({ id: _id, localImageUrl: _local, ...wine }) => wine),
   }
 }
 

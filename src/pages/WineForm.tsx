@@ -252,7 +252,11 @@ function WineForm({ wine }: { wine?: Wine }) {
           <section className="panel window-panel">
             <div className="window-head">
               <div className="window-bottle">
-                <Bottle imageUrl={form.imageUrl || null} type={normalized.type} />
+                <Bottle
+                  imageUrl={form.imageUrl || null}
+                  localImageUrl={normalized.imageUrl === wine?.imageUrl ? wine.localImageUrl : null}
+                  type={normalized.type}
+                />
               </div>
               <div>
                 <p className="eyebrow">Drinking window</p>
