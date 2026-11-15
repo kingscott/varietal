@@ -254,7 +254,7 @@ function WineForm({ wine }: { wine?: Wine }) {
               <div className="window-bottle">
                 <Bottle
                   imageUrl={form.imageUrl || null}
-                  localImageUrl={form.imageUrl === wine?.imageUrl ? wine.localImageUrl : null}
+                  localImageUrl={normalized.imageUrl === wine?.imageUrl ? wine.localImageUrl : null}
                   type={normalized.type}
                 />
               </div>

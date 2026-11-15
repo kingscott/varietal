@@ -44,6 +44,8 @@ export function readImage(id: string): { bytes: Uint8Array<ArrayBuffer>; type: s
   if (!dir || !isImageId(id) || !existsSync(join(dir, id))) return null
   const bytes = readFileSync(join(dir, id))
   const type = imageType(bytes)
+  // A damaged file is removed so the next save or restart downloads it again.
+  if (!type) rmSync(join(dir, id), { force: true })
   return type ? { bytes, type } : null
 }
 

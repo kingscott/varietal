@@ -1,4 +1,4 @@
-import { mkdtempSync, readdirSync, rmSync } from 'node:fs'
+import { mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
@@ -73,6 +73,15 @@ describe('saveImage', () => {
     expect(image?.type).toBe('image/png')
     expect(new Uint8Array(image!.bytes)).toEqual(PNG)
     expect(readdirSync(join(dir, 'images'))).toEqual([id])
+  })
+
+  it('removes a damaged stored file so it is downloaded again', async () => {
+    const url = 'https://images.vivino.com/damaged.png'
+    stubFetch(PNG)
+    await images.saveImage(url)
+    writeFileSync(join(dir, 'images', images.imageId(url)), 'not an image')
+    expect(images.readImage(images.imageId(url))).toBeNull()
+    expect(images.localImageUrl(url)).toBeNull()
   })
 
   it('does not follow redirects', async () => {
