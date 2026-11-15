@@ -4,11 +4,19 @@
   "version": "0.0.0",
   "description": "A free and self-hostable way to track your cellar.",
   "author": "Scott King",
+  "license": "MIT",
   "homepage": "https://github.com/kingscott/varietal",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kingscott/varietal.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kingscott/varietal/issues"
+  },
   "private": true,
   "type": "module",
   "main": "dist-electron/main.cjs",
-  "packageManager": "pnpm@12.15.0",
+  "packageManager": "pnpm@12.21.0",
   "scripts": {
     "dev": "pnpm run --parallel \"/^dev:/\"",
     "dev:server": "node --watch server/index.ts",
@@ -23,25 +31,25 @@
   "dependencies": {
     "@fontsource-variable/fraunces": "^5.3.0",
     "@fontsource-variable/inter": "^5.3.0",
-    "@hono/node-server": "^2.1.5",
-    "@tanstack/react-query": "^5.104.4",
-    "@tanstack/react-router": "^1.170.45",
-    "hono": "^4.13.13",
-    "papaparse": "^5.7.0",
+    "@hono/node-server": "^2.1.8",
+    "@tanstack/react-query": "^5.107.1",
+    "@tanstack/react-router": "^1.170.46",
+    "hono": "^4.13.18",
+    "papaparse": "^5.7.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "@types/papaparse": "^5.5.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^6.1.2",
-    "electron": "^45.2.1",
+    "@vitejs/plugin-react": "^6.3.0",
+    "electron": "^45.3.2",
     "electron-builder": "^26.18.0",
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2",
-    "vite": "^8.3.4",
-    "vitest": "^5.0.5"
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
   }
 }
