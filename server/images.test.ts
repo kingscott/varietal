@@ -75,6 +75,12 @@ describe('saveImage', () => {
     expect(readdirSync(join(dir, 'images'))).toEqual([id])
   })
 
+  it('does not follow redirects', async () => {
+    const fetch = stubFetch(PNG)
+    await images.saveImage('https://images.vivino.com/no-redirect.png')
+    expect(fetch).toHaveBeenCalledWith('https://images.vivino.com/no-redirect.png', expect.objectContaining({ redirect: 'error' }))
+  })
+
   it('only downloads https URLs', async () => {
     const fetch = stubFetch(PNG)
     await expect(images.saveImage('http://images.vivino.com/a.png')).rejects.toThrow('https')

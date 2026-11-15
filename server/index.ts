@@ -70,7 +70,7 @@ app.get('/api/images/:id', (c) => {
   // The file for a URL never changes, so the browser can keep it.
   c.header('Cache-Control', 'public, max-age=31536000, immutable')
   c.header('Content-Type', image.type)
-  return c.body(new Uint8Array(image.bytes))
+  return c.body(image.bytes)
 })
 
 app.get('/api/lookup', async (c) => {

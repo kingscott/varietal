@@ -9,8 +9,9 @@ if (!app.isPackaged) app.setPath('userData', join(app.getPath('appData'), 'Varie
 async function seedDemoCellar() {
   // Imported here because the server's database reads DB_PATH on import.
   const { createWines } = await import('../server/db.ts')
+  const { saveImages } = await import('../server/images.ts')
   const wines = JSON.parse(readFileSync(join(app.getAppPath(), 'electron/demo-wines.json'), 'utf8'))
-  createWines(wines.map(normalizeWine))
+  void saveImages(createWines(wines.map(normalizeWine)).map((w) => w.imageUrl))
 }
 
 function openExternal(url: string) {

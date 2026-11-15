@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 
 /**
@@ -40,7 +40,7 @@ export function localImageUrl(url: string | null): string | null {
 }
 
 /** A stored image and its content type, or null for an unknown id. */
-export function readImage(id: string): { bytes: Buffer; type: string } | null {
+export function readImage(id: string): { bytes: Uint8Array<ArrayBuffer>; type: string } | null {
   if (!dir || !isImageId(id) || !existsSync(join(dir, id))) return null
   const bytes = readFileSync(join(dir, id))
   const type = imageType(bytes)
@@ -49,9 +49,9 @@ export function readImage(id: string): { bytes: Buffer; type: string } | null {
 
 async function download(url: string): Promise<Uint8Array> {
   if (!url.startsWith('https://')) throw new Error('Only https images are downloaded')
-  const response = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) })
+  // Redirects aren't followed, so a URL can't send the server on to an http or internal address.
+  const response = await fetch(url, { redirect: 'error', signal: AbortSignal.timeout(TIMEOUT_MS) })
   if (!response.ok || !response.body) throw new Error(`Image download failed (${response.status})`)
-  if (response.url && !response.url.startsWith('https://')) throw new Error('Image redirected away from https')
   if (!response.headers.get('content-type')?.startsWith('image/')) throw new Error('Not an image')
   if (Number(response.headers.get('content-length')) > MAX_BYTES) throw new Error('Image too large')
 
@@ -81,8 +81,14 @@ export function saveImage(url: string): Promise<void> {
       .then((bytes) => {
         mkdirSync(target, { recursive: true })
         // Write then rename, so a half-written file is never served.
-        writeFileSync(join(target, `${id}.tmp`), bytes)
-        renameSync(join(target, `${id}.tmp`), join(target, id))
+        const tmp = join(target, `${id}.tmp`)
+        try {
+          writeFileSync(tmp, bytes)
+          renameSync(tmp, join(target, id))
+        } catch (error) {
+          rmSync(tmp, { force: true })
+          throw error
+        }
       })
       .finally(() => pending.delete(id))
     pending.set(id, job)

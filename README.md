@@ -22,7 +22,7 @@ Ready-to-drink wines are listed most urgent first. Switch to **Tuesday night** t
 
 Search uses Vivino's catalogue to fill in producer, region, grapes, type, rating and label image.
 
-The server downloads each label image once and stores it in an `images` folder next to the database, so Vivino is only contacted when you search for or add a wine.
+The server downloads each label image once and stores it in an `images` folder next to the database, so browsing your cellar doesn't contact Vivino. Vivino is still contacted when you search for or add a wine, and when the server downloads a label it hasn't stored yet.
 
 ### Drinking windows
 
