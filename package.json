@@ -4,7 +4,15 @@
   "version": "0.0.0",
   "description": "A free and self-hostable way to track your cellar.",
   "author": "Scott King",
+  "license": "MIT",
   "homepage": "https://github.com/kingscott/varietal",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kingscott/varietal.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kingscott/varietal/issues"
+  },
   "private": true,
   "type": "module",
   "main": "dist-electron/main.cjs",
