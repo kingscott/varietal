@@ -27,15 +27,18 @@ const wine = (overrides: Record<string, unknown> = {}, id = 1): Wine => ({
     ...overrides,
   }),
   id,
+  localImageUrl: null,
   createdAt: '2024-05-06 07:08:09',
 })
 
 const roundTrip = (wines: Wine[]) => parseCellarExport(JSON.stringify(createCellarExport(wines)))
 
 describe('cellar export', () => {
-  it('round-trips every field except the id', () => {
-    const { id: _id, ...expected } = wine()
-    expect(roundTrip([wine()])).toEqual([expected])
+  it('round-trips every field except the id and the stored image path', () => {
+    const { id: _id, localImageUrl: _local, ...expected } = wine()
+    const stored = { ...wine(), localImageUrl: '/api/images/abc' }
+    expect(createCellarExport([stored]).wines[0]).not.toHaveProperty('localImageUrl')
+    expect(roundTrip([stored])).toEqual([expected])
   })
 
   it('keeps finished wines, sparse wines and non-vintage wines as they are', () => {
@@ -53,7 +56,7 @@ describe('cellar export', () => {
       ratingsCount: null,
       imageUrl: null,
     })
-    const { id: _id, ...expected } = sparse
+    const { id: _id, localImageUrl: _local, ...expected } = sparse
     expect(roundTrip([sparse])).toEqual([expected])
   })
 

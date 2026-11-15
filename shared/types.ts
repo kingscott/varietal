@@ -33,10 +33,12 @@ export interface Wine {
   rating: number | null
   ratingsCount: number | null
   imageUrl: string | null
+  /** The copy of the label image stored by this server, when it has one */
+  localImageUrl: string | null
   createdAt: string
 }
 
-export type WineInput = Omit<Wine, 'id' | 'createdAt'>
+export type WineInput = Omit<Wine, 'id' | 'createdAt' | 'localImageUrl'>
 
 export interface LookupVintage {
   year: number | null
